@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1018" />
+  <meta name="description" content="Panel privado y local para administrar ingresos, gastos, presupuestos y patrimonio." />
+  <title>Nexo Finanzas</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Navegación principal">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+        <div><strong>Nexo</strong><small>FINANZAS</small></div>
+      </div>
+
+      <nav id="main-nav">
+        <button class="nav-item active" data-view="dashboard"><span class="nav-icon">⌂</span><span>Inicio</span></button>
+        <button class="nav-item" data-view="movements"><span class="nav-icon">↕</span><span>Movimientos</span></button>
+        <button class="nav-item" data-view="planning"><span class="nav-icon">▤</span><span>Planificación</span></button>
+        <button class="nav-item" data-view="commitments"><span class="nav-icon">◷</span><span>Vencimientos</span><span id="due-badge" class="nav-badge">0</span></button>
+        <button class="nav-item" data-view="wealth"><span class="nav-icon">◇</span><span>Patrimonio</span></button>
+        <button class="nav-item" data-view="reports"><span class="nav-icon">⌁</span><span>Informes</span></button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <button class="nav-item" data-view="settings"><span class="nav-icon">⚙</span><span>Configuración</span></button>
+        <div class="privacy-note"><span class="privacy-dot"></span><div><strong>Datos privados</strong><small>Guardados en este dispositivo</small></div></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow" id="view-eyebrow">RESUMEN PERSONAL</p>
+          <h1 id="view-title">Tu economía, hoy</h1>
+        </div>
+        <div class="top-actions">
+          <label class="month-picker" aria-label="Mes del informe"><span>Mes</span><input id="month-filter" type="month" /></label>
+          <button class="icon-button" id="quick-search" aria-label="Buscar movimientos">⌕</button>
+          <button class="primary-button" id="add-transaction">＋ Nuevo movimiento</button>
+        </div>
+      </header>
+
+      <div class="views">
+        <section class="view active" id="view-dashboard" aria-labelledby="view-title">
+          <div class="hero-card">
+            <div class="hero-copy">
+              <span class="hero-label">PATRIMONIO NETO</span>
+              <div class="hero-value" id="net-worth">$ 0</div>
+              <div class="hero-delta" id="net-worth-delta">Actualizado con tus cuentas y deudas</div>
+            </div>
+            <div class="hero-orbit" aria-hidden="true"><div class="orbit-core"><span>NEXO</span><strong id="health-score">—</strong><small>salud mensual</small></div></div>
+            <div class="hero-actions"><button class="ghost-light" data-view-link="wealth">Ver patrimonio</button></div>
+          </div>
+
+          <div class="metric-grid">
+            <article class="metric-card"><div class="metric-heading"><span class="metric-symbol income">↗</span><span>Ingresos del mes</span></div><strong id="month-income">$ 0</strong><small id="income-count">0 movimientos</small></article>
+            <article class="metric-card"><div class="metric-heading"><span class="metric-symbol expense">↘</span><span>Gastos del mes</span></div><strong id="month-expense">$ 0</strong><small id="expense-count">0 movimientos</small></article>
+            <article class="metric-card"><div class="metric-heading"><span class="metric-symbol balance">≈</span><span>Balance disponible</span></div><strong id="month-balance">$ 0</strong><small id="savings-rate">0% de ahorro</small></article>
+            <article class="metric-card"><div class="metric-heading"><span class="metric-symbol budget">◎</span><span>Presupuesto usado</span></div><strong id="budget-used">0%</strong><div class="mini-progress"><span id="budget-progress"></span></div></article>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="panel cashflow-panel">
+              <div class="panel-head"><div><span class="section-kicker">FLUJO DE CAJA</span><h2>Ingresos y gastos</h2></div><div class="legend"><span><i class="legend-income"></i>Ingresos</span><span><i class="legend-expense"></i>Gastos</span></div></div>
+              <div id="cashflow-chart" class="cashflow-chart"></div>
+            </article>
+            <article class="panel due-panel">
+              <div class="panel-head"><div><span class="section-kicker">PRÓXIMOS 30 DÍAS</span><h2>Vencimientos</h2></div><button class="text-button" data-view-link="commitments">Ver todos</button></div>
+              <div id="dashboard-dues" class="due-list"></div>
+            </article>
+          </div>
+
+          <div class="dashboard-grid lower">
+            <article class="panel">
+              <div class="panel-head"><div><span class="section-kicker">DISTRIBUCIÓN</span><h2>Gastos por categoría</h2></div><button class="text-button" data-view-link="reports">Analizar</button></div>
+              <div class="category-overview"><div id="category-donut" class="donut"><div><strong id="donut-total">$ 0</strong><small>Total gastado</small></div></div><div id="category-legend" class="category-legend"></div></div>
+            </article>
+            <article class="panel">
+              <div class="panel-head"><div><span class="section-kicker">ACTIVIDAD</span><h2>Últimos movimientos</h2></div><button class="text-button" data-view-link="movements">Ver todos</button></div>
+              <div id="recent-transactions" class="compact-transactions"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="view-movements">
+          <div class="view-toolbar">
+            <div class="segmented" id="movement-tabs"><button class="active" data-type="all">Todos</button><button data-type="expense">Gastos</button><button data-type="income">Ingresos</button><button data-type="transfer">Transferencias</button></div>
+            <div class="toolbar-actions"><label class="search-box">⌕<input id="transaction-search" placeholder="Buscar por concepto o categoría" /></label><select id="category-filter" aria-label="Filtrar por categoría"><option value="all">Todas las categorías</option></select></div>
+          </div>
+          <div class="table-summary"><div><small>Resultado visible</small><strong id="filtered-result">$ 0</strong></div><div><small>Ingresos</small><strong id="filtered-income">$ 0</strong></div><div><small>Gastos</small><strong id="filtered-expense">$ 0</strong></div></div>
+          <article class="panel table-panel"><div class="responsive-table"><table><thead><tr><th>Fecha</th><th>Movimiento</th><th>Categoría</th><th>Cuenta</th><th>Estado</th><th class="amount-cell">Importe</th><th></th></tr></thead><tbody id="transaction-table"></tbody></table></div><div id="transaction-empty" class="empty-state hidden"><strong>No hay movimientos</strong><span>Cambiá los filtros o registrá uno nuevo.</span></div></article>
+        </section>
+
+        <section class="view" id="view-planning">
+          <div class="planning-top">
+            <article class="planning-score"><span class="section-kicker">PLAN DEL MES</span><div><strong id="plan-remaining">$ 0</strong><small>disponible después del presupuesto</small></div><div class="planning-ring" id="planning-ring"><span id="planning-percent">0%</span></div></article>
+            <article class="panel plan-callout"><div><span class="section-kicker">REGLA PERSONAL</span><h2>Asigná cada peso antes de gastarlo</h2><p>El presupuesto compara tus límites con los gastos reales del mes.</p></div><button class="secondary-button" id="add-budget">＋ Agregar categoría</button></article>
+          </div>
+          <div id="budget-list" class="budget-list"></div>
+          <div class="section-heading"><div><span class="section-kicker">OBJETIVOS</span><h2>Metas de ahorro</h2></div><button class="secondary-button" id="add-goal">＋ Nueva meta</button></div>
+          <div id="goal-grid" class="goal-grid"></div>
+        </section>
+
+        <section class="view" id="view-commitments">
+          <div class="commitment-summary" id="commitment-summary"></div>
+          <div class="section-heading"><div><span class="section-kicker">AGENDA FINANCIERA</span><h2>Pagos e ingresos recurrentes</h2></div><button class="secondary-button" id="add-commitment">＋ Nuevo compromiso</button></div>
+          <div class="timeline-layout"><div id="commitment-list" class="commitment-list"></div><aside class="panel calendar-card"><div class="panel-head"><div><span class="section-kicker">CALENDARIO</span><h2 id="calendar-title">Mes</h2></div></div><div class="calendar-weekdays"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div><div id="mini-calendar" class="mini-calendar"></div><div class="calendar-foot"><i></i>Día con vencimiento</div></aside></div>
+        </section>
+
+        <section class="view" id="view-wealth">
+          <div class="wealth-hero"><div><span class="section-kicker">BALANCE GENERAL</span><h2 id="wealth-total">$ 0</h2><p>Activos menos deudas registradas</p></div><div class="wealth-breakdown"><div><span>Activos</span><strong id="asset-total">$ 0</strong></div><div><span>Deudas</span><strong id="debt-total">$ 0</strong></div></div></div>
+          <div class="wealth-grid">
+            <div><div class="section-heading"><div><span class="section-kicker">CUENTAS</span><h2>Dinero y tarjetas</h2></div><button class="secondary-button" id="add-account">＋ Nueva cuenta</button></div><div id="account-list" class="account-list"></div></div>
+            <div><div class="section-heading"><div><span class="section-kicker">OBLIGACIONES</span><h2>Deudas y préstamos</h2></div><button class="secondary-button" id="add-debt">＋ Nueva deuda</button></div><div id="debt-list" class="debt-list"></div></div>
+          </div>
+        </section>
+
+        <section class="view" id="view-reports">
+          <div class="report-kpis" id="report-kpis"></div>
+          <div class="dashboard-grid">
+            <article class="panel"><div class="panel-head"><div><span class="section-kicker">EVOLUCIÓN</span><h2>Resultado de los últimos 6 meses</h2></div></div><div id="trend-chart" class="trend-chart"></div></article>
+            <article class="panel"><div class="panel-head"><div><span class="section-kicker">HÁBITOS</span><h2>Lectura del mes</h2></div></div><div id="insights" class="insight-list"></div></article>
+          </div>
+          <div class="dashboard-grid lower"><article class="panel"><div class="panel-head"><div><span class="section-kicker">RANKING</span><h2>Categorías con mayor gasto</h2></div></div><div id="category-ranking" class="ranking-list"></div></article><article class="panel"><div class="panel-head"><div><span class="section-kicker">FIJOS Y VARIABLES</span><h2>Estructura de gastos</h2></div></div><div id="expense-structure" class="structure-chart"></div></article></div>
+        </section>
+
+        <section class="view" id="view-settings">
+          <div class="settings-grid">
+            <article class="panel settings-card"><span class="section-kicker">PREFERENCIAS</span><h2>Moneda y formato</h2><label>Moneda<select id="currency-setting"><option value="ARS">Peso argentino (ARS)</option><option value="USD">Dólar estadounidense (USD)</option><option value="EUR">Euro (EUR)</option><option value="UYU">Peso uruguayo (UYU)</option></select></label><label>Nombre del espacio<input id="workspace-name" maxlength="30" placeholder="Mis finanzas" /></label><button class="secondary-button" id="save-settings">Guardar preferencias</button></article>
+            <article class="panel settings-card"><span class="section-kicker">COPIA DE SEGURIDAD</span><h2>Control de tus datos</h2><p>Exportá toda la información en un archivo JSON. Podés restaurarlo en otro dispositivo o navegador.</p><div class="stack-actions"><button class="primary-button" id="export-data">Exportar copia completa</button><label class="secondary-button file-button">Importar copia<input type="file" id="import-data" accept="application/json" /></label></div></article>
+            <article class="panel settings-card danger-zone"><span class="section-kicker">ZONA DE CONTROL</span><h2>Reiniciar aplicación</h2><p>Elimina movimientos, cuentas, presupuestos y configuraciones de este dispositivo.</p><button class="danger-button" id="reset-data">Eliminar todos los datos</button></article>
+            <article class="panel settings-card"><span class="section-kicker">SEGURIDAD</span><h2>Arquitectura local-first</h2><ul class="security-list"><li><span>✓</span>Sin cuentas ni contraseñas externas</li><li><span>✓</span>Sin rastreadores ni publicidad</li><li><span>✓</span>Funciona sin conexión</li><li><span>✓</span>GitHub aloja la aplicación, no tus datos</li></ul></article>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <nav class="mobile-nav" aria-label="Navegación móvil"><button class="active" data-view="dashboard">⌂<span>Inicio</span></button><button data-view="movements">↕<span>Movimientos</span></button><button id="mobile-add">＋</button><button data-view="planning">▤<span>Plan</span></button><button data-view="commitments">◷<span>Agenda</span></button></nav>
+
+  <dialog id="app-dialog">
+    <form method="dialog" id="dialog-form">
+      <div class="dialog-head"><div><span class="section-kicker" id="dialog-kicker">REGISTRO</span><h2 id="dialog-title">Nuevo movimiento</h2></div><button type="button" class="dialog-close" id="dialog-close" aria-label="Cerrar">×</button></div>
+      <div id="dialog-fields" class="dialog-fields"></div>
+      <div class="dialog-actions"><button type="button" class="secondary-button" id="dialog-cancel">Cancelar</button><button type="submit" class="primary-button" id="dialog-submit">Guardar</button></div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="./app.js" defer></script>
+</body>
+</html>
