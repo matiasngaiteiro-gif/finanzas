@@ -1,158 +1,167 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0b1018" />
-  <meta name="description" content="Panel privado y local para administrar ingresos, gastos, presupuestos y patrimonio." />
-  <title>Nexo Finanzas</title>
-  <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="icon" href="./icon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="./styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#17233d">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src https://*.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'">
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=()">
+  <title>Intendencia | Órdenes de trabajo</title>
+  <link rel="stylesheet" href="styles.css?v=7">
+  <link rel="stylesheet" href="enhancements.css?v=7">
+  <link rel="stylesheet" href="actions.css?v=7">
+  <link rel="stylesheet" href="services.css?v=7">
+  <link rel="stylesheet" href="workflow.css?v=10">
+  <link rel="stylesheet" href="auth.css?v=8">
+  <link rel="stylesheet" href="modules.css?v=9">
 </head>
 <body>
   <div class="app-shell">
-    <aside class="sidebar" aria-label="Navegación principal">
-      <div class="brand">
-        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
-        <div><strong>Nexo</strong><small>FINANZAS</small></div>
-      </div>
-
-      <nav id="main-nav">
-        <button class="nav-item active" data-view="dashboard"><span class="nav-icon">⌂</span><span>Inicio</span></button>
-        <button class="nav-item" data-view="movements"><span class="nav-icon">↕</span><span>Movimientos</span></button>
-        <button class="nav-item" data-view="planning"><span class="nav-icon">▤</span><span>Planificación</span></button>
-        <button class="nav-item" data-view="commitments"><span class="nav-icon">◷</span><span>Vencimientos</span><span id="due-badge" class="nav-badge">0</span></button>
-        <button class="nav-item" data-view="wealth"><span class="nav-icon">◇</span><span>Patrimonio</span></button>
-        <button class="nav-item" data-view="reports"><span class="nav-icon">⌁</span><span>Informes</span></button>
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark">IC</span><div><strong>Intendencia</strong><small>Cámara Comercial</small></div></div>
+      <nav>
+        <button class="nav-item active" data-view="dashboard">Panel general</button>
+        <button class="nav-item" data-view="orders">Órdenes de trabajo</button>
+        <button class="nav-item" data-view="people">Personal</button>
+        <button class="nav-item" data-view="tools">Herramientas</button>
+        <button class="nav-item" data-view="services">Servicios</button>
+        <button class="nav-item" data-view="contacts">Contactos de utilidad</button>
       </nav>
-
-      <div class="sidebar-bottom">
-        <button class="nav-item" data-view="settings"><span class="nav-icon">⚙</span><span>Configuración</span></button>
-        <div class="privacy-note"><span class="privacy-dot"></span><div><strong>Datos privados</strong><small>Guardados en este dispositivo</small></div></div>
-      </div>
+      <div class="sidebar-footer"><span class="online-dot"></span> Datos guardados localmente</div>
     </aside>
 
-    <main class="main">
+    <main>
       <header class="topbar">
-        <div>
-          <p class="eyebrow" id="view-eyebrow">RESUMEN PERSONAL</p>
-          <h1 id="view-title">Tu economía, hoy</h1>
-        </div>
-        <div class="top-actions">
-          <label class="month-picker" aria-label="Mes del informe"><span>Mes</span><input id="month-filter" type="month" /></label>
-          <button class="icon-button" id="quick-search" aria-label="Buscar movimientos">⌕</button>
-          <button class="primary-button" id="add-transaction">＋ Nuevo movimiento</button>
-        </div>
+        <div><p class="eyebrow">GESTIÓN OPERATIVA</p><h1 id="pageTitle">Panel general</h1></div>
+        <div class="top-actions"><div class="session-user"><small>Sesión activa</small><strong id="sessionEmail"></strong></div><button class="secondary" id="logoutBtn">Cerrar sesión</button></div>
       </header>
 
-      <div class="views">
-        <section class="view active" id="view-dashboard" aria-labelledby="view-title">
-          <div class="hero-card">
-            <div class="hero-copy">
-              <span class="hero-label">PATRIMONIO NETO</span>
-              <div class="hero-value" id="net-worth">$ 0</div>
-              <div class="hero-delta" id="net-worth-delta">Actualizado con tus cuentas y deudas</div>
-            </div>
-            <div class="hero-orbit" aria-hidden="true"><div class="orbit-core"><span>NEXO</span><strong id="health-score">—</strong><small>salud mensual</small></div></div>
-            <div class="hero-actions"><button class="ghost-light" data-view-link="wealth">Ver patrimonio</button></div>
-          </div>
+      <section id="dashboardView" class="view active">
+        <div class="metrics" id="metrics"></div>
+        <div class="content-grid">
+          <section class="panel"><div class="panel-head"><div><h2>Actividad por edificio</h2><p>Órdenes activas y resueltas</p></div></div><div id="buildingSummary"></div></section>
+          <section class="panel"><div class="panel-head"><div><h2>Atención prioritaria</h2><p>Urgentes, demoradas o sin asignar</p></div></div><div id="priorityList"></div></section>
+        </div>
+        <section class="panel recent"><div class="panel-head"><div><h2>Órdenes recientes</h2><p>Últimas actualizaciones del equipo</p></div><button class="text-button" data-go="orders">Ver todas</button></div><div id="recentOrders"></div></section>
+      </section>
 
-          <div class="metric-grid">
-            <article class="metric-card"><div class="metric-heading"><span class="metric-symbol income">↗</span><span>Ingresos del mes</span></div><strong id="month-income">$ 0</strong><small id="income-count">0 movimientos</small></article>
-            <article class="metric-card"><div class="metric-heading"><span class="metric-symbol expense">↘</span><span>Gastos del mes</span></div><strong id="month-expense">$ 0</strong><small id="expense-count">0 movimientos</small></article>
-            <article class="metric-card"><div class="metric-heading"><span class="metric-symbol balance">≈</span><span>Balance disponible</span></div><strong id="month-balance">$ 0</strong><small id="savings-rate">0% de ahorro</small></article>
-            <article class="metric-card"><div class="metric-heading"><span class="metric-symbol budget">◎</span><span>Presupuesto usado</span></div><strong id="budget-used">0%</strong><div class="mini-progress"><span id="budget-progress"></span></div></article>
-          </div>
+      <section id="ordersView" class="view">
+        <div class="people-header"><p>Creá y consultá las tareas del equipo.</p><button class="primary" id="newOrderBtn">+ Nueva orden</button></div>
+        <div class="toolbar panel">
+          <input id="searchInput" type="search" placeholder="Buscar por número, tarea, sector o responsable">
+          <select id="statusFilter"><option value="">Todos los estados</option></select>
+          <select id="buildingFilter"><option value="">Todos los edificios</option></select>
+          <select id="specialtyFilter"><option value="">Todas las especialidades</option></select>
+        </div>
+        <div class="panel"><div class="panel-head"><div><h2>Órdenes de trabajo</h2><p id="ordersCount"></p></div></div><div id="ordersTable"></div></div>
+      </section>
 
-          <div class="dashboard-grid">
-            <article class="panel cashflow-panel">
-              <div class="panel-head"><div><span class="section-kicker">FLUJO DE CAJA</span><h2>Ingresos y gastos</h2></div><div class="legend"><span><i class="legend-income"></i>Ingresos</span><span><i class="legend-expense"></i>Gastos</span></div></div>
-              <div id="cashflow-chart" class="cashflow-chart"></div>
-            </article>
-            <article class="panel due-panel">
-              <div class="panel-head"><div><span class="section-kicker">PRÓXIMOS 30 DÍAS</span><h2>Vencimientos</h2></div><button class="text-button" data-view-link="commitments">Ver todos</button></div>
-              <div id="dashboard-dues" class="due-list"></div>
-            </article>
-          </div>
+      <section id="peopleView" class="view">
+        <div class="people-header"><p>Administrá la dotación disponible para asignar trabajos.</p><button class="secondary" id="newPersonBtn">+ Agregar empleado</button></div>
+        <div class="people-grid" id="peopleGrid"></div>
+      </section>
 
-          <div class="dashboard-grid lower">
-            <article class="panel">
-              <div class="panel-head"><div><span class="section-kicker">DISTRIBUCIÓN</span><h2>Gastos por categoría</h2></div><button class="text-button" data-view-link="reports">Analizar</button></div>
-              <div class="category-overview"><div id="category-donut" class="donut"><div><strong id="donut-total">$ 0</strong><small>Total gastado</small></div></div><div id="category-legend" class="category-legend"></div></div>
-            </article>
-            <article class="panel">
-              <div class="panel-head"><div><span class="section-kicker">ACTIVIDAD</span><h2>Últimos movimientos</h2></div><button class="text-button" data-view-link="movements">Ver todos</button></div>
-              <div id="recent-transactions" class="compact-transactions"></div>
-            </article>
-          </div>
-        </section>
+      <section id="toolsView" class="view">
+        <div class="people-header"><div><p>Inventario y registro de herramientas entregadas al personal.</p></div><button class="secondary" id="newToolBtn">+ Cargar herramienta</button></div>
+        <div class="metrics tool-metrics" id="toolMetrics"></div>
+        <div class="toolbar panel tool-toolbar">
+          <input id="toolSearch" type="search" placeholder="Buscar herramienta, marca, modelo o responsable">
+          <select id="toolStatusFilter"><option value="">Todos los estados</option><option>Disponible</option><option>Entregada</option><option>En reparación</option><option>Fuera de servicio</option></select>
+        </div>
+        <div class="panel"><div class="panel-head"><div><h2>Inventario de herramientas</h2><p id="toolsCount"></p></div></div><div id="toolsTable"></div></div>
+      </section>
 
-        <section class="view" id="view-movements">
-          <div class="view-toolbar">
-            <div class="segmented" id="movement-tabs"><button class="active" data-type="all">Todos</button><button data-type="expense">Gastos</button><button data-type="income">Ingresos</button><button data-type="transfer">Transferencias</button></div>
-            <div class="toolbar-actions"><label class="search-box">⌕<input id="transaction-search" placeholder="Buscar por concepto o categoría" /></label><select id="category-filter" aria-label="Filtrar por categoría"><option value="all">Todas las categorías</option></select></div>
-          </div>
-          <div class="table-summary"><div><small>Resultado visible</small><strong id="filtered-result">$ 0</strong></div><div><small>Ingresos</small><strong id="filtered-income">$ 0</strong></div><div><small>Gastos</small><strong id="filtered-expense">$ 0</strong></div></div>
-          <article class="panel table-panel"><div class="responsive-table"><table><thead><tr><th>Fecha</th><th>Movimiento</th><th>Categoría</th><th>Cuenta</th><th>Estado</th><th class="amount-cell">Importe</th><th></th></tr></thead><tbody id="transaction-table"></tbody></table></div><div id="transaction-empty" class="empty-state hidden"><strong>No hay movimientos</strong><span>Cambiá los filtros o registrá uno nuevo.</span></div></article>
-        </section>
+      <section id="servicesView" class="view">
+        <div class="people-header"><p>Contratos, prestadores, vencimientos y reclamos organizados por edificio.</p><button class="secondary" id="newServiceBtn">+ Cargar servicio</button></div>
+        <div id="servicesByBuilding"></div>
+      </section>
 
-        <section class="view" id="view-planning">
-          <div class="planning-top">
-            <article class="planning-score"><span class="section-kicker">PLAN DEL MES</span><div><strong id="plan-remaining">$ 0</strong><small>disponible después del presupuesto</small></div><div class="planning-ring" id="planning-ring"><span id="planning-percent">0%</span></div></article>
-            <article class="panel plan-callout"><div><span class="section-kicker">REGLA PERSONAL</span><h2>Asigná cada peso antes de gastarlo</h2><p>El presupuesto compara tus límites con los gastos reales del mes.</p></div><button class="secondary-button" id="add-budget">＋ Agregar categoría</button></article>
-          </div>
-          <div id="budget-list" class="budget-list"></div>
-          <div class="section-heading"><div><span class="section-kicker">OBJETIVOS</span><h2>Metas de ahorro</h2></div><button class="secondary-button" id="add-goal">＋ Nueva meta</button></div>
-          <div id="goal-grid" class="goal-grid"></div>
-        </section>
-
-        <section class="view" id="view-commitments">
-          <div class="commitment-summary" id="commitment-summary"></div>
-          <div class="section-heading"><div><span class="section-kicker">AGENDA FINANCIERA</span><h2>Pagos e ingresos recurrentes</h2></div><button class="secondary-button" id="add-commitment">＋ Nuevo compromiso</button></div>
-          <div class="timeline-layout"><div id="commitment-list" class="commitment-list"></div><aside class="panel calendar-card"><div class="panel-head"><div><span class="section-kicker">CALENDARIO</span><h2 id="calendar-title">Mes</h2></div></div><div class="calendar-weekdays"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div><div id="mini-calendar" class="mini-calendar"></div><div class="calendar-foot"><i></i>Día con vencimiento</div></aside></div>
-        </section>
-
-        <section class="view" id="view-wealth">
-          <div class="wealth-hero"><div><span class="section-kicker">BALANCE GENERAL</span><h2 id="wealth-total">$ 0</h2><p>Activos menos deudas registradas</p></div><div class="wealth-breakdown"><div><span>Activos</span><strong id="asset-total">$ 0</strong></div><div><span>Deudas</span><strong id="debt-total">$ 0</strong></div></div></div>
-          <div class="wealth-grid">
-            <div><div class="section-heading"><div><span class="section-kicker">CUENTAS</span><h2>Dinero y tarjetas</h2></div><button class="secondary-button" id="add-account">＋ Nueva cuenta</button></div><div id="account-list" class="account-list"></div></div>
-            <div><div class="section-heading"><div><span class="section-kicker">OBLIGACIONES</span><h2>Deudas y préstamos</h2></div><button class="secondary-button" id="add-debt">＋ Nueva deuda</button></div><div id="debt-list" class="debt-list"></div></div>
-          </div>
-        </section>
-
-        <section class="view" id="view-reports">
-          <div class="report-kpis" id="report-kpis"></div>
-          <div class="dashboard-grid">
-            <article class="panel"><div class="panel-head"><div><span class="section-kicker">EVOLUCIÓN</span><h2>Resultado de los últimos 6 meses</h2></div></div><div id="trend-chart" class="trend-chart"></div></article>
-            <article class="panel"><div class="panel-head"><div><span class="section-kicker">HÁBITOS</span><h2>Lectura del mes</h2></div></div><div id="insights" class="insight-list"></div></article>
-          </div>
-          <div class="dashboard-grid lower"><article class="panel"><div class="panel-head"><div><span class="section-kicker">RANKING</span><h2>Categorías con mayor gasto</h2></div></div><div id="category-ranking" class="ranking-list"></div></article><article class="panel"><div class="panel-head"><div><span class="section-kicker">FIJOS Y VARIABLES</span><h2>Estructura de gastos</h2></div></div><div id="expense-structure" class="structure-chart"></div></article></div>
-        </section>
-
-        <section class="view" id="view-settings">
-          <div class="settings-grid">
-            <article class="panel settings-card"><span class="section-kicker">PREFERENCIAS</span><h2>Moneda y formato</h2><label>Moneda<select id="currency-setting"><option value="ARS">Peso argentino (ARS)</option><option value="USD">Dólar estadounidense (USD)</option><option value="EUR">Euro (EUR)</option><option value="UYU">Peso uruguayo (UYU)</option></select></label><label>Nombre del espacio<input id="workspace-name" maxlength="30" placeholder="Mis finanzas" /></label><button class="secondary-button" id="save-settings">Guardar preferencias</button></article>
-            <article class="panel settings-card"><span class="section-kicker">COPIA DE SEGURIDAD</span><h2>Control de tus datos</h2><p>Exportá toda la información en un archivo JSON. Podés restaurarlo en otro dispositivo o navegador.</p><div class="stack-actions"><button class="primary-button" id="export-data">Exportar copia completa</button><label class="secondary-button file-button">Importar copia<input type="file" id="import-data" accept="application/json" /></label></div></article>
-            <article class="panel settings-card danger-zone"><span class="section-kicker">ZONA DE CONTROL</span><h2>Reiniciar aplicación</h2><p>Elimina movimientos, cuentas, presupuestos y configuraciones de este dispositivo.</p><button class="danger-button" id="reset-data">Eliminar todos los datos</button></article>
-            <article class="panel settings-card"><span class="section-kicker">SEGURIDAD</span><h2>Arquitectura local-first</h2><ul class="security-list"><li><span>✓</span>Sin cuentas ni contraseñas externas</li><li><span>✓</span>Sin rastreadores ni publicidad</li><li><span>✓</span>Funciona sin conexión</li><li><span>✓</span>GitHub aloja la aplicación, no tus datos</li></ul></article>
-          </div>
-        </section>
-      </div>
+      <section id="contactsView" class="view">
+        <div class="people-header"><p>Agenda centralizada de proveedores, organismos y contactos operativos.</p><div><button class="secondary" id="importContactsBtn">Cargar contactos oficiales PJN</button> <button class="secondary" id="newContactBtn">+ Agregar contacto</button></div></div>
+        <div class="toolbar panel contact-toolbar"><input id="contactSearch" type="search" aria-label="Buscar contactos" placeholder="Buscar juzgado, dependencia, nombre, teléfono o correo"></div>
+        <div class="panel"><div class="panel-head"><div><h2>Contactos de utilidad</h2><p id="contactsCount"></p></div></div><div id="contactsTable"></div></div>
+      </section>
     </main>
   </div>
 
-  <nav class="mobile-nav" aria-label="Navegación móvil"><button class="active" data-view="dashboard">⌂<span>Inicio</span></button><button data-view="movements">↕<span>Movimientos</span></button><button id="mobile-add">＋</button><button data-view="planning">▤<span>Plan</span></button><button data-view="commitments">◷<span>Agenda</span></button></nav>
-
-  <dialog id="app-dialog">
-    <form method="dialog" id="dialog-form">
-      <div class="dialog-head"><div><span class="section-kicker" id="dialog-kicker">REGISTRO</span><h2 id="dialog-title">Nuevo movimiento</h2></div><button type="button" class="dialog-close" id="dialog-close" aria-label="Cerrar">×</button></div>
-      <div id="dialog-fields" class="dialog-fields"></div>
-      <div class="dialog-actions"><button type="button" class="secondary-button" id="dialog-cancel">Cancelar</button><button type="submit" class="primary-button" id="dialog-submit">Guardar</button></div>
+  <dialog id="orderDialog">
+    <form id="orderForm" method="dialog">
+      <div class="modal-head"><div><p class="eyebrow">ORDEN DE TRABAJO</p><h2 id="orderModalTitle">Nueva orden</h2></div><button type="button" class="icon-btn close-modal">×</button></div>
+      <input type="hidden" name="id">
+      <div class="form-grid">
+        <label class="wide">Tarea o reparación<select name="template" required></select></label>
+        <label class="wide" id="customTaskLabel" hidden>Otra tarea<input name="customTask" maxlength="90" placeholder="Indicá qué hay que hacer"></label>
+        <label>Edificio<select name="building" required></select></label>
+        <label>Dependencia<select name="dependency" required></select></label>
+        <label class="wide">Detalle del sector, oficina o puerta<input name="location" required placeholder="Ej.: 9.º piso, oficina 914, puerta 22"></label>
+        <label>Categoría<select name="category" required></select></label>
+        <label>Prioridad<select name="priority" required></select></label>
+        <label>Estado<select name="status" required></select></label>
+        <label>Responsable<select name="assignee"></select></label>
+        <label>Fecha límite<input name="dueDate" type="date"></label>
+        <label class="wide">Descripción<textarea name="description" rows="3" placeholder="Detalle del problema, materiales o indicaciones"></textarea></label>
+      </div>
+      <div class="modal-actions"><button type="button" class="danger" id="deleteOrderBtn">Eliminar orden</button><button type="button" class="finish-button" id="finishOrderBtn">Finalizar orden</button><span class="action-spacer"></span><button type="button" class="secondary close-modal">Cancelar</button><button class="primary" type="submit">Guardar orden</button></div>
     </form>
   </dialog>
 
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="./app.js" defer></script>
+  <dialog id="personDialog">
+    <form id="personForm" method="dialog">
+      <div class="modal-head"><h2>Agregar empleado</h2><button type="button" class="icon-btn close-person">×</button></div>
+      <div class="form-grid"><label class="wide">Nombre y apellido<input name="name" required></label><label>Especialidad<select name="role" required></select></label><label>Edificio base<select name="building" required></select></label><label class="wide">WhatsApp<input name="phone" inputmode="tel" placeholder="Ej.: 1155551234"></label></div>
+      <div class="modal-actions"><button type="button" class="secondary close-person">Cancelar</button><button class="primary" type="submit">Agregar</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="serviceDialog"><form id="serviceForm" method="dialog"><div class="modal-head"><div><p class="eyebrow">SERVICIOS</p><h2 id="serviceModalTitle">Cargar servicio</h2></div><button type="button" class="icon-btn close-service">×</button></div><input type="hidden" name="id"><div class="form-grid"><label>Edificio<select name="building" required></select></label><label>Tipo de servicio<select name="serviceType" required></select></label><label>Empresa / prestador<input name="provider" required></label><label>Vigente hasta<input name="endDate" type="date"></label><label>Contacto<input name="contactName" placeholder="Nombre y apellido"></label><label>Teléfono<input name="phone" inputmode="tel"></label><label class="wide">Correo electrónico<input name="email" type="email"></label><label class="wide">Observaciones<textarea name="notes" rows="3"></textarea></label></div><div class="modal-actions"><button type="button" class="danger" id="deleteServiceBtn">Eliminar</button><span class="action-spacer"></span><button type="button" class="secondary close-service">Cancelar</button><button class="primary" type="submit">Guardar servicio</button></div></form></dialog>
+
+  <dialog id="claimDialog"><form id="claimForm" method="dialog"><div class="modal-head"><div><p class="eyebrow">RECLAMO DE SERVICIO</p><h2 id="claimTitle">Generar correo</h2></div><button type="button" class="icon-btn close-claim">×</button></div><input type="hidden" name="serviceId"><div class="form-grid"><label class="wide">Motivo del reclamo<select name="reason" required></select></label><label class="wide">Ubicación precisa<input name="location" required placeholder="Piso, oficina, sector o equipo"></label><label class="wide">Detalle adicional<textarea name="detail" rows="3"></textarea></label><label class="wide">Correo generado<textarea id="claimEmail" rows="10" readonly></textarea></label></div><div class="modal-actions"><button type="button" class="secondary" id="copyClaimBtn">Copiar correo</button><button type="button" class="primary" id="generateClaimBtn">Redactar correo</button></div></form></dialog>
+
+  <dialog id="contactDialog"><form id="contactForm" method="dialog"><div class="modal-head"><div><p class="eyebrow">AGENDA</p><h2 id="contactModalTitle">Agregar contacto</h2></div><button type="button" class="icon-btn close-contact">×</button></div><input type="hidden" name="id"><div class="form-grid"><label>Nombre<input name="name" required></label><label>Entidad / empresa<input name="organization"></label><label>Función o rubro<input name="role" required></label><label>Edificio relacionado<select name="building"></select></label><label>Teléfono<input name="phone" inputmode="tel"></label><label>Correo<input name="email" type="email"></label><label class="wide">Notas<textarea name="notes" rows="3"></textarea></label></div><div class="modal-actions"><button type="button" class="danger" id="deleteContactBtn">Eliminar</button><span class="action-spacer"></span><button type="button" class="secondary close-contact">Cancelar</button><button class="primary" type="submit">Guardar contacto</button></div></form></dialog>
+
+  <dialog id="messageDialog">
+    <div class="modal-head"><div><p class="eyebrow">ASIGNACIÓN GENERADA</p><h2>Mensaje para WhatsApp</h2></div><button type="button" class="icon-btn close-message">×</button></div>
+    <div class="message-body"><textarea id="whatsappMessage" rows="11" readonly></textarea></div>
+    <div class="modal-actions order-actions"><a class="primary whatsapp-link" id="openWhatsappBtn" target="_blank" rel="noopener">Enviar por WhatsApp</a><button type="button" class="secondary" id="copyMessageBtn">Copiar orden</button><button type="button" class="secondary" id="printOrderBtn">Imprimir orden</button></div>
+  </dialog>
+
+  <dialog id="toolDialog">
+    <form id="toolForm" method="dialog">
+      <div class="modal-head"><div><p class="eyebrow">INVENTARIO</p><h2 id="toolModalTitle">Cargar herramienta</h2></div><button type="button" class="icon-btn close-tool">×</button></div>
+      <input type="hidden" name="id">
+      <div class="form-grid">
+        <label>Herramienta<input name="name" required placeholder="Ej.: Taladro percutor"></label>
+        <label>Tipo<select name="type" required><option>Herramienta eléctrica</option><option>Herramienta manual</option><option>Instrumento de medición</option><option>Elemento de seguridad</option><option>Equipo de mantenimiento</option><option>Otro</option></select></label>
+        <label>Marca<input name="brand" required placeholder="Ej.: Bosch"></label>
+        <label>Modelo<input name="model" required placeholder="Ej.: GSB 13 RE"></label>
+        <label>N.º de inventario o serie<input name="serial" placeholder="Identificación interna"></label>
+        <label>Estado<select name="toolStatus" required><option>Disponible</option><option>Entregada</option><option>En reparación</option><option>Fuera de servicio</option></select></label>
+        <label>Entregada a<select name="holder"></select></label>
+        <label>Fecha de entrega<input name="assignedDate" type="date"></label>
+        <label class="wide">Observaciones<textarea name="notes" rows="3" placeholder="Estado, accesorios incluidos o aclaraciones"></textarea></label>
+      </div>
+      <div id="toolReturnHistory"></div>
+      <div class="modal-actions"><button type="button" class="danger" id="deleteToolBtn">Eliminar</button><button type="button" class="finish-button" id="returnToolBtn">Ya la devolvió</button><span class="action-spacer"></span><button type="button" class="secondary close-tool">Cancelar</button><button class="primary" type="submit">Guardar herramienta</button></div>
+    </form>
+  </dialog>
+
+  <section id="printSheet" class="print-sheet" aria-hidden="true"></section>
+  <section id="authScreen" class="auth-screen">
+    <form id="loginForm" class="login-card">
+      <div class="brand auth-brand"><span class="brand-mark">IC</span><div><strong>Intendencia</strong><small>Cámara Comercial</small></div></div>
+      <p class="eyebrow">ACCESO RESTRINGIDO</p><h1>Sistema de gestión</h1><p class="login-copy">Ingresá con el usuario autorizado por la Intendencia.</p>
+      <p>Usuario: <strong>Master</strong></p>
+      <label>Contraseña<input name="password" type="password" autocomplete="current-password" minlength="8" required></label>
+      <p id="loginError" class="login-error" role="alert"></p><button class="primary login-submit" type="submit">Ingresar</button>
+      <p class="config-warning" id="configWarning">Primero completá la configuración de Supabase en <strong>config.js</strong>.</p>
+    </form>
+  </section>
+  <div id="toast" class="toast"></div>
+  <script src="config.js?v=9"></script>
+  <script src="supabase-api.js?v=9"></script>
+  <script src="modules.js?v=9"></script>
+  <script src="contacts-data.js?v=10"></script>
+  <script src="app.js?v=10"></script>
 </body>
 </html>
